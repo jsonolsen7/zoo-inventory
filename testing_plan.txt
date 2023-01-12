@@ -1,0 +1,24 @@
+### Requirements of Tests ###
+
+The purpose of the tests will be to (1) ensure that the database correctly
+creates tables and inserts the required data with proper data types, (2) check the
+appropriate files exist, and (3) determine the routes are performing their functions.
+Thus, the scope of the tests will include the database connection, functionality, and output of routes.
+The inputs will be the HTTP requests, SQL statements (tables created, data inserted, analysis of data) and
+the presence of necessary files. The outputs will be two tables: (1) enclosures
+with an id and name and (2) animals with id, animal name, quantity of animal, and
+enclosure they belong to. The latter will require a foreign key so the tables will
+be connected via JOIN. A report of the tests (with descriptions) must also be created.
+The tests will assume that the data are class objects and that all names are strings
+and id's/quantities are integers. It will also use logging, os, python-dotenv, and psycopg2,
+where the latter requires python version 3.10.7 so this is a contraint of the test.
+Other constraints are that only three tests will be used and they will be unit tests only.
+A potential issue could be multiple species in the same enclosure, or one species in multiple enclosures.
+
+### User Stories ###
+
+As a developer, I want to be able to run the appropriate unit tests to ensure my flask app
+has all the necessary files and creates/imports the necessary databases/data.
+
+As a user, I want to be able to insert data using the correct data types so that its calculations
+can be accurately maintained and analyzed.
