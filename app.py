@@ -6,15 +6,21 @@ import psycopg2
 load_dotenv()
 url = os.getenv("DB_URL")
 
-def create_app():
+def create_app(config):
 
     app = Flask(__name__)
+    app.config.from_object(config)
 
     connection = psycopg2.connect(url)
 
     CREATE_ENCLOSURES_TABLE = (
         "CREATE TABLE IF NOT EXISTS enclosures (id SERIAL PRIMARY KEY, name TEXT);"
     )
+
+    # without foreign key:
+    # CREATE_ANIMALS_TABLE = (
+    #     "CREATE TABLE IF NOT EXISTS animals (id SERIAL PRIMARY KEY, name TEXT, quantity INTEGER, enclosure_id INTEGER);"
+    # )
 
     CREATE_ANIMALS_TABLE = (
         "CREATE TABLE IF NOT EXISTS animals (id SERIAL PRIMARY KEY, name TEXT, quantity INTEGER, enclosure_id INTEGER, FOREIGN KEY(enclosure_id) REFERENCES enclosures(id) ON DELETE CASCADE);"
@@ -24,8 +30,6 @@ def create_app():
     INSERT_ANIMAL = (
         "INSERT INTO animals (name, quantity, enclosure_id) VALUES (%s, %s, %s);"
     )
-
-    GET_ONE_ENCLOSURE = "SELECT name FROM enclosures WHERE id = (%s)"
 
     GET_HABITAT_BY_ID = "SELECT enclosures.name, animals.id, animals.name, animals.quantity FROM enclosures INNER JOIN animals ON enclosures.id=animals.enclosure_id WHERE enclosures.id = (%s);"
     GET_HABITAT_BY_NAME = "SELECT enclosures.name, animals.id, animals.name, animals.quantity FROM enclosures INNER JOIN animals ON enclosures.id=animals.enclosure_id WHERE enclosures.name = (%s);"
@@ -55,7 +59,7 @@ def create_app():
             with connection.cursor() as cursor:
                 cursor.execute(CREATE_ANIMALS_TABLE)
                 cursor.execute(INSERT_ANIMAL, (name, quantity, enclosure_id))
-            return {"message": "New species added!"}, 201
+            return {"message": f"New species, {name}, added to enclosure {enclosure_id}!"}, 201
 
     @app.get("/api/habitat/<enclosure_id_or_name>")
     def get_habitat(enclosure_id_or_name):
@@ -72,9 +76,10 @@ def create_app():
                     habitat = result[0]
                     animals.append({"animal_id": result[1], "name": result[2], "quantity": result[3]})
             return {habitat: animals}, 201
+
     return app
 
-app = create_app()
+app = create_app({"TESTING": False})
 
 if __name__ == "__main__":
     app.run(debug=True)
